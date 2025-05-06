@@ -1,0 +1,8 @@
+# mengabaikan virtual environtment
+.venv/
+
+# Abaikan file atau folder lain yang tidak perlu ditrack Git
+__pycache__/
+*.pyc
+.DS_Store
+*.log
