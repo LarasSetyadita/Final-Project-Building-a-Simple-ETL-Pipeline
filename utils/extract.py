@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 HEADERS = {
     "User-Agent" : (
@@ -15,21 +16,26 @@ def extract_collection_data(div):
 
     price_tag = div.find("span", class_="price")
     price = price_tag.get_text(strip=True) if price_tag else "Tidak tersedia"
-
+    
+    # scraping data yang ada di tag <p>
     p_tags = div.find_all('p')
-    if len(p_tags) >= 4:
-        colors = p_tags[1].text.strip()
-        size = p_tags[2].text.strip().replace("Size: ", "")
-        gender = p_tags[3].text.strip().replace("Gender: ", "")
-    else:
-        colors = size = gender = None
+
+    rating = p_tags[0].text.strip().split('/')[0].replace('Rating: ', '') if len(p_tags) > 0 else 'N/A'
+    colors = p_tags[1].text.strip()
+    size = p_tags[2].text.strip().replace("Size: ", "")
+    gender = p_tags[3].text.strip().replace("Gender: ", "")
+
+    # return waktu sekarang
+    timestamp = datetime.now().isoformat()
 
     return {
         "product_title" : product_title,
         "price" : price,
+        "ratings" : rating,
         "colors" : colors,
         "size" : size,
-        "gender" : gender
+        "gender" : gender,
+        "timestamp": timestamp
     }
 
 def fetch_page_content(url):
@@ -79,18 +85,3 @@ def scrape_collection_data(url):
         page += 1
 
     return data
-
-def main():
-    """Fungsi utama untuk menjalankan proses scraping dan menyimpan data."""
-    url = 'https://fashion-studio.dicoding.dev'
-    collection_data = scrape_collection_data(url)
- 
-    if collection_data:
-        # Jika data berhasil diambil, simpan dalam DataFrame dan tampilkan
-        df = pd.DataFrame(collection_data)
-        print(df)
-    else:
-        print("Tidak ada data yang ditemukan.")
-
-if __name__ == "__main__":
-    main()
