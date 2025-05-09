@@ -10,7 +10,9 @@ HEADERS = {
     )
 }
 
+
 def extract_collection_data(div):
+    """fungsi untuk mengekstrak data dari tag html """
     product_title_tag = div.find("h3", class_="product-title")
     product_title = product_title_tag.get_text(strip=True) if product_title_tag else "Tidak tersedia"
 
@@ -38,6 +40,7 @@ def extract_collection_data(div):
         "timestamp": timestamp
     }
 
+
 def fetch_page_content(url):
     """Mengambil konten HTML dari URL dengan user-agent yang ditentukan."""
     try:
@@ -48,40 +51,36 @@ def fetch_page_content(url):
         print(f"Error saat mengambil {url}: {e}")
         return None
 
+
 def scrape_collection_data(url):
     """Melakukan scraping semua data dari halaman koleksi produk, termasuk halaman berikutnya."""
     data = []
     page = 1  # Mulai dari halaman pertama
 
-    while True:
-        # Bangun URL untuk setiap halaman
-
+    while page <= 50:
+        # Mendefinisikan url untuk setiap halaman yang akan di scraping
         if (page == 1) :
-            current_url = url
+            current_url = url # url pertama memiliki format yang berbeda
         else: 
             current_url = f"{url}/page{page}"
-            print(current_url)
+            # print(current_url) # ini aku pakai untuk mengecek url
 
         content = fetch_page_content(current_url)
         
         if not content:
-            break  # Jika konten tidak ditemukan (misalnya halaman tidak ada), berhenti
+            break
 
         soup = BeautifulSoup(content, 'html.parser')
-        
-        # Temukan semua elemen produk dengan class 'collection-card'
-        cards = soup.find_all('div', class_='collection-card')
+        cards = soup.find_all('div', class_='collection-card') # mencari elemen produk di dalam class 'collection-card'
 
-        # Jika tidak ada produk pada halaman, berhenti
-        if not cards:
+        if not cards: # berhenti scraping jika produk tidak ada
             break
         
         # Ambil data produk dari setiap card
         for card in cards:
             collection_data = extract_collection_data(card)
             data.append(collection_data)
-        
-        # Lanjutkan ke halaman berikutnya
-        page += 1
+
+        page += 1 # melanjutkan ke halaman berikutnya
 
     return data
