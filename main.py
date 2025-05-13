@@ -2,7 +2,7 @@ import pandas as pd
 
 from utils.extract import scrape_collection_data
 from utils.transform import transform, transform_to_Dataframe
-from utils.load import store_to_postgre, create_database
+from utils.load import store_to_postgre, create_database, store_to_csv, store_to_spreadsheet
 
 
 def main():
@@ -19,6 +19,13 @@ def main():
         print("Tidak ada data yang ditemukan.")
 
     products_df.info() # mengecek tipe data
+
+    # menyimpan data ke dalam format csv
+    #store_to_csv(products_df)
+
+    # menyimpan data ke dalam format excel
+    #store_to_spreadsheet(products_df)
+
 
     # menyimpan data ke dalam postgresql
     #db_name = 'productsdb'

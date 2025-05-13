@@ -1,6 +1,19 @@
 from sqlalchemy import create_engine
 import psycopg2
 from psycopg2 import sql
+import csv
+import pandas as pd
+
+
+def store_to_csv(data) :
+    """Load data ke dalam format csv"""
+    data.to_csv('products.csv', index=False)
+
+
+
+def store_to_spreadsheet(data):
+    data.to_excel('products.xlsx', index=False, engine='openpyxl')
+
 
 
 def create_database(db_name):
@@ -35,6 +48,7 @@ def create_database(db_name):
 
     except Exception as e:
         print(f"Pembuatan database gagal : {e}") # pesan error jika pembuatan database gagal
+
 
 
 def store_to_postgre(data, db_url, table_name='producttoscrape'):
