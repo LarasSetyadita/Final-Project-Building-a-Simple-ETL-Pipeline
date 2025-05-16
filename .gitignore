@@ -6,3 +6,6 @@ __pycache__/
 *.pyc
 .DS_Store
 *.log
+
+# Ignore credential file
+sentiment-analysis-456613-7a6e0a6a71ad.json

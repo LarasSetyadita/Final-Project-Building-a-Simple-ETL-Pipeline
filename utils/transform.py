@@ -26,6 +26,7 @@ def transform_rating(data):
 def transform_title(data):
     """Transformasi data nama produk"""
     data['product_title'] = data['product_title'].astype('object')
+    data['product_title'] = data['product_title'].str.replace(r'\s+\d+$', '', regex=True)
     return data
 
 def transform_color(data):

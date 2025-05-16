@@ -21,10 +21,11 @@ def main():
     products_df.info() # mengecek tipe data
 
     # menyimpan data ke dalam format csv
-    #store_to_csv(products_df)
+    store_to_csv(products_df)
 
     # menyimpan data ke dalam format excel
-    #store_to_spreadsheet(products_df)
+    spreadsheet_id = '1reol3Wu--fGOmqfC8N0vJMXUzW2rosA31YWvtRWsOTo'
+    store_to_spreadsheet(products_df, spreadsheet_id)
 
 
     # menyimpan data ke dalam postgresql

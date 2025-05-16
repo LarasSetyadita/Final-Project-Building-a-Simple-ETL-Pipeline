@@ -3,6 +3,9 @@ import psycopg2
 from psycopg2 import sql
 import csv
 import pandas as pd
+import gspread
+from gspread_dataframe import set_with_dataframe
+from oauth2client.service_account import ServiceAccountCredentials
 
 
 def store_to_csv(data) :
@@ -11,8 +14,26 @@ def store_to_csv(data) :
 
 
 
-def store_to_spreadsheet(data):
-    data.to_excel('products.xlsx', index=False, engine='openpyxl')
+def store_to_spreadsheet(data, spreadsheet_id, worksheet_name='Sheet1', credentials_json='sentiment-analysis-456613-7a6e0a6a71ad.json'):
+    """Load data ke dalam format spreadsheet"""
+    # Autentikasi Google API
+    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+    creds = ServiceAccountCredentials.from_json_keyfile_name(credentials_json, scope)
+    client = gspread.authorize(creds)
+
+    # Buka spreadsheet yang sudah ada dengan ID
+    spreadsheet = client.open_by_key(spreadsheet_id)
+
+    # Pilih worksheet (sheet) sesuai nama (default 'Sheet1')
+    worksheet = spreadsheet.worksheet(worksheet_name)
+
+    # Hapus isi worksheet dulu (opsional, supaya update bersih)
+    worksheet.clear()
+
+    # Masukkan dataframe ke worksheet
+    set_with_dataframe(worksheet, data)
+    print(f'Data berhasil diupload ke Google Sheets dengan ID: {spreadsheet_id} pada worksheet: {worksheet_name}')
+
 
 
 
