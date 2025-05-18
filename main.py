@@ -20,8 +20,10 @@ def main():
 
     products_df.info() # mengecek tipe data
 
+
     # menyimpan data ke dalam format csv
     store_to_csv(products_df)
+
 
     # menyimpan data ke dalam format excel
     spreadsheet_id = '1reol3Wu--fGOmqfC8N0vJMXUzW2rosA31YWvtRWsOTo'
@@ -29,10 +31,10 @@ def main():
 
 
     # menyimpan data ke dalam postgresql
-    #db_name = 'productsdb'
-    #create_database(db_name)
-    #db_url = 'postgresql+psycopg2://developer:supersecretpassword@localhost:5432/productsdb'
-    #store_to_postgre(products_df, db_url)
+    db_name = 'productsdb'
+    create_database(db_name)
+    db_url = 'postgresql+psycopg2://developer:supersecretpassword@localhost:5432/productsdb'
+    store_to_postgre(products_df, db_url)
 
 if __name__ == "__main__":
     main()

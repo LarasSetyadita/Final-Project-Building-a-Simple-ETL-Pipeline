@@ -1,5 +1,6 @@
 # mengabaikan virtual environtment
 .venv/
+.coverage/
 
 # Abaikan file atau folder lain yang tidak perlu ditrack Git
 __pycache__/

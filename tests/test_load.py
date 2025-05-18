@@ -5,6 +5,7 @@ from utils.load import store_to_postgre, create_database, store_to_csv, store_to
 
 
 class TestETLFunctions(unittest.TestCase):
+
     def setUp(self):
         # DataFrame dummy
         self.df = pd.DataFrame({
@@ -17,16 +18,45 @@ class TestETLFunctions(unittest.TestCase):
             'timestamp': [pd.Timestamp('2023-01-01 00:00:00')]
         })
 
+        self.spreadsheet_id = 'dummy_spreadsheet_id'
+        self.worksheet_name = 'Sheet1'
+
     def test_store_to_csv(self):
         store_to_csv(self.df)
         read_back = pd.read_csv('products.csv')
         read_back["timestamp"] = pd.to_datetime(read_back["timestamp"])
         pd.testing.assert_frame_equal(self.df, read_back)
 
-    def test_store_to_spreadsheet(self):
-        store_to_spreadsheet(self.df)
-        read_back = pd.read_excel('products.xlsx', engine='openpyxl')
-        pd.testing.assert_frame_equal(self.df, read_back)
+    @patch('utils.load.set_with_dataframe')
+    @patch('utils.load.gspread.authorize')
+    @patch('utils.load.ServiceAccountCredentials.from_json_keyfile_name')
+    def test_store_to_spreadsheet(self, mock_creds, mock_authorize, mock_set_with_dataframe):
+        # Setup mock objects
+        mock_client = MagicMock()
+        mock_spreadsheet = MagicMock()
+        mock_worksheet = MagicMock()
+
+        # Chain mocks
+        mock_creds.return_value = 'mocked_creds'
+        mock_authorize.return_value = mock_client
+        mock_client.open_by_key.return_value = mock_spreadsheet
+        mock_spreadsheet.worksheet.return_value = mock_worksheet
+
+        # Call function
+        store_to_spreadsheet(
+            data=self.df,
+            spreadsheet_id=self.spreadsheet_id,
+            worksheet_name=self.worksheet_name,
+            credentials_json='sentiment-analysis-456613-7a6e0a6a71ad.json'
+        )
+
+        # Assertions
+        mock_creds.assert_called_once()
+        mock_authorize.assert_called_once_with('mocked_creds')
+        mock_client.open_by_key.assert_called_once_with(self.spreadsheet_id)
+        mock_spreadsheet.worksheet.assert_called_once_with(self.worksheet_name)
+        mock_worksheet.clear.assert_called_once()
+        mock_set_with_dataframe.assert_called_once_with(mock_worksheet, self.df)
 
     @patch('utils.load.psycopg2.connect')
     def test_create_database(self, mock_connect):

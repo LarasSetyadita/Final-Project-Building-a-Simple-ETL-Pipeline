@@ -13,32 +13,70 @@ HEADERS = {
 
 def extract_collection_data(div):
     """fungsi untuk mengekstrak data dari tag html """
-    product_title_tag = div.find("h3", class_="product-title")
-    product_title = product_title_tag.get_text(strip=True) if product_title_tag else "Tidak tersedia"
+    try:
+        product_title_tag = div.find("h3", class_="product-title")
+        product_title = product_title_tag.get_text(strip=True) if product_title_tag else "Tidak tersedia"
 
-    price_tag = div.find("span", class_="price")
-    price = price_tag.get_text(strip=True) if price_tag else "Tidak tersedia"
-    
-    # scraping data yang ada di tag <p>
-    p_tags = div.find_all('p')
+        price_tag = div.find("span", class_="price")
+        price = price_tag.get_text(strip=True) if price_tag else "Tidak tersedia"
 
-    rating = p_tags[0].text.strip().split('/')[0].replace('Rating: ', '') if len(p_tags) > 0 else 'N/A'
-    colors = p_tags[1].text.strip()
-    size = p_tags[2].text.strip().replace("Size: ", "")
-    gender = p_tags[3].text.strip().replace("Gender: ", "")
+        # scraping data yang ada di tag <p>
+        p_tags = div.find_all('p')
 
-    # return waktu sekarang
-    timestamp = datetime.now().isoformat()
+        rating = 'N/A'
+        colors = 'Tidak tersedia'
+        size = 'Tidak tersedia'
+        gender = 'Tidak tersedia'
 
-    return {
-        "product_title" : product_title,
-        "price" : price,
-        "ratings" : rating,
-        "colors" : colors,
-        "size" : size,
-        "gender" : gender,
-        "timestamp": timestamp
-    }
+        if len(p_tags) > 0:
+            try:
+                rating = p_tags[0].text.strip().split('/')[0].replace('Rating: ', '')
+            except Exception:
+                rating = 'N/A'
+
+        if len(p_tags) > 1:
+            try:
+                colors = p_tags[1].text.strip()
+            except Exception:
+                colors = 'Tidak tersedia'
+
+        if len(p_tags) > 2:
+            try:
+                size = p_tags[2].text.strip().replace("Size: ", "")
+            except Exception:
+                size = 'Tidak tersedia'
+
+        if len(p_tags) > 3:
+            try:
+                gender = p_tags[3].text.strip().replace("Gender: ", "")
+            except Exception:
+                gender = 'Tidak tersedia'
+
+        # return waktu sekarang
+        timestamp = datetime.now().isoformat()
+
+        return {
+            "product_title": product_title,
+            "price": price,
+            "ratings": rating,
+            "colors": colors,
+            "size": size,
+            "gender": gender,
+            "timestamp": timestamp
+        }
+
+    except Exception as e:
+        print(f"Error saat ekstraksi data: {e}")
+        # Kembalikan dictionary dengan nilai default jika error fatal
+        return {
+            "product_title": "Tidak tersedia",
+            "price": "Tidak tersedia",
+            "ratings": "N/A",
+            "colors": "Tidak tersedia",
+            "size": "Tidak tersedia",
+            "gender": "Tidak tersedia",
+            "timestamp": datetime.now().isoformat()
+        }
 
 
 def fetch_page_content(url):
